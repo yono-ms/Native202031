@@ -2,8 +2,8 @@ package com.example.native202031
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.github.kittinunf.fuel.Fuel
-import com.github.kittinunf.fuel.coroutines.awaitStringResponseResult
+import com.example.native202031.network.ServerAPI
+import com.example.native202031.network.UserModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
@@ -35,17 +35,6 @@ class CheckUserViewModel : ViewModel() {
     private val _userNameIsError = MutableStateFlow(true)
     val userNameIsError: StateFlow<Boolean> = _userNameIsError
 
-    private val urlBase = "https://api.github.com"
-    private val urlUsers = "$urlBase/users/"
-
-    suspend fun get(urlString: String): String {
-        logger.info("request START")
-        val (request, response, result) = Fuel.get(urlString).awaitStringResponseResult()
-        logger.info("$request")
-        logger.info("$response")
-        return result.get()
-    }
-
     fun userNameChanged(value: String) {
         logger.info("userNameChanged $value")
         viewModelScope.launch {
@@ -76,7 +65,9 @@ class CheckUserViewModel : ViewModel() {
 
             kotlin.runCatching {
                 _progress.value = true
-                get("$urlUsers${userName.value}")
+                ServerAPI.getDecode(ServerAPI.getUsersUrl(userName.value), UserModel.serializer())
+            }.onSuccess { userModel ->
+                logger.debug("$userModel")
             }.onFailure {
                 logger.error("check", it)
                 showDialog(it.message, it.javaClass.simpleName)
