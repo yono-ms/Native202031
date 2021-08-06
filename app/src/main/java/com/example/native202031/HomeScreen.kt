@@ -36,7 +36,7 @@ fun HomeScreen(viewModel: MainViewModel = MainViewModel()) {
         Button(onClick = {
             name = "pushed!"
             viewModel.homeSignIn()
-            viewModel.showDialog.value = true
+            //viewModel.showDialog.value = true
         }) {
             Text(text = "Button to NextScreen")
         }

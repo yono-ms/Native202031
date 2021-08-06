@@ -63,6 +63,9 @@ fun MainScreen(
         composable(DestScreen.SIGN_IN.route) {
             SignInScreen(mainViewModel)
         }
+        composable(DestScreen.CHECK_USER.route) {
+            CheckUserScreen()
+        }
     }
 }
 

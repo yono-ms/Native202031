@@ -11,7 +11,7 @@ fun MessageDialog(text: String, title: String? = null, onClick: () -> Unit) {
 
     var titleText: @Composable (() -> Unit)? = null
     title?.let {
-        titleText = { Text(text = "text") }
+        titleText = { Text(text = it) }
     }
 
     val okText = stringResource(id = android.R.string.ok)

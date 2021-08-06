@@ -51,9 +51,10 @@ class MainViewModel : ViewModel() {
         logger.info("homeSignIn")
         viewModelScope.launch {
             _progress.value = true
-            delay(2000)
+            delay(1000)
             _progress.value = false
-            _destScreen.send(DestScreen.SIGN_IN)
+            //_destScreen.send(DestScreen.SIGN_IN)
+            _destScreen.send(DestScreen.CHECK_USER)
         }
     }
 
