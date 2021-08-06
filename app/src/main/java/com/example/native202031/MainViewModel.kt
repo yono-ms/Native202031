@@ -27,6 +27,16 @@ class MainViewModel : ViewModel() {
     private val _welcomeMessage = MutableStateFlow("Hello world!")
     val welcomeMessage: StateFlow<String> = _welcomeMessage
 
+    private val _userName = MutableStateFlow("")
+    val userName: StateFlow<String> = _userName
+
+    fun userNameChanged(value: String) {
+        viewModelScope.launch {
+            logger.debug("user name = $value")
+            _userName.value = value
+        }
+    }
+
     init {
         logger.info("init")
         viewModelScope.launch {

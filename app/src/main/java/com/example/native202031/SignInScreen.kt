@@ -18,9 +18,7 @@ import com.example.native202031.ui.theme.Native202031Theme
 
 @Composable
 fun SignInScreen(viewModel: MainViewModel = MainViewModel()) {
-    var userName by remember {
-        mutableStateOf("")
-    }
+    val userName = viewModel.userName.collectAsState()
     var password by remember {
         mutableStateOf("")
     }
@@ -36,8 +34,8 @@ fun SignInScreen(viewModel: MainViewModel = MainViewModel()) {
         Text(text = "SignIn Screen!")
         Spacer(modifier = Modifier.height(16.dp))
         TextField(
-            value = userName,
-            onValueChange = { userName = it },
+            value = userName.value,
+            onValueChange = { viewModel.userNameChanged(it) },
             label = { Text(text = "User Name") },
             placeholder = { Text(text = "your login name") },
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email),

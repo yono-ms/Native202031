@@ -14,6 +14,7 @@ import com.example.native202031.ui.theme.Native202031Theme
 
 @Composable
 fun HomeScreen(viewModel: MainViewModel = MainViewModel()) {
+    val userName = viewModel.userName.collectAsState()
     var name by remember {
         mutableStateOf("")
     }
@@ -24,7 +25,7 @@ fun HomeScreen(viewModel: MainViewModel = MainViewModel()) {
             .fillMaxWidth(),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        Text(text = "Home Screen!")
+        Text(text = userName.value)
         Spacer(modifier = Modifier.height(16.dp))
         Text(text = name)
         Spacer(modifier = Modifier.height(16.dp))
