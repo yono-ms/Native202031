@@ -4,6 +4,8 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.native202031.network.ServerAPI
 import com.example.native202031.network.UserModel
+import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.channels.ReceiveChannel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
@@ -68,6 +70,7 @@ class CheckUserViewModel : ViewModel() {
                 ServerAPI.getDecode(ServerAPI.getUsersUrl(userName.value), UserModel.serializer())
             }.onSuccess { userModel ->
                 logger.debug("$userModel")
+                _destScreen.send(DestScreen.BACK)
             }.onFailure {
                 logger.error("check", it)
                 showDialog(it.message, it.javaClass.simpleName)
@@ -87,4 +90,8 @@ class CheckUserViewModel : ViewModel() {
         logger.info("dismissDialog")
         viewModelScope.launch { _showDialog.value = false }
     }
+
+    private val _destScreen = Channel<DestScreen>()
+    val destScreen: ReceiveChannel<DestScreen> = _destScreen
+
 }

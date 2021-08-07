@@ -10,6 +10,8 @@ import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.viewModelScope
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -17,6 +19,7 @@ import androidx.navigation.compose.rememberNavController
 import com.example.native202031.ui.theme.Native202031Theme
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.receiveAsFlow
+import kotlinx.coroutines.launch
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 
@@ -64,6 +67,15 @@ fun MainScreen(
             SignInScreen(mainViewModel)
         }
         composable(DestScreen.CHECK_USER.route) {
+            val viewModel: CheckUserViewModel = viewModel()
+            viewModel.viewModelScope.launch {
+                viewModel.destScreen.receiveAsFlow().collect {
+                    when (it) {
+                        DestScreen.BACK -> navController.popBackStack()
+                        else -> navController.navigate(it.route)
+                    }
+                }
+            }
             CheckUserScreen()
         }
     }

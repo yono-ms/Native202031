@@ -18,6 +18,7 @@ import com.example.native202031.ui.theme.Native202031Theme
 
 @Composable
 fun CheckUserScreen(viewModel: CheckUserViewModel = viewModel()) {
+
     val userName by viewModel.userName.collectAsState()
     val userNameLabel by viewModel.userNameLabel.collectAsState()
     val userNameIsError by viewModel.userNameIsError.collectAsState()
