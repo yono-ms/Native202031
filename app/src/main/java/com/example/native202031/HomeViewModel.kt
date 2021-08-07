@@ -29,7 +29,7 @@ class HomeViewModel : BaseViewModel() {
                     userModel.reposUrl,
                     ListSerializer(RepoModel.serializer())
                 )
-                repoModel.map { it.name }
+                repoModel.map { RepositoryItem.fromRepoModel(it) }
             }.onSuccess {
                 _repositories.value = it
             }.onFailure {
@@ -48,8 +48,8 @@ class HomeViewModel : BaseViewModel() {
         }
     }
 
-    private val _repositories = MutableStateFlow(listOf<String>())
-    val repositories: StateFlow<List<String>> = _repositories
+    private val _repositories = MutableStateFlow(listOf<RepositoryItem>())
+    val repositories: StateFlow<List<RepositoryItem>> = _repositories
 
 
 }

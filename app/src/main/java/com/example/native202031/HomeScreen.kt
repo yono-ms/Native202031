@@ -10,6 +10,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.native202031.ui.theme.Native202031Theme
 
@@ -23,7 +24,7 @@ fun HomeScreen(viewModel: HomeViewModel = viewModel()) {
 }
 
 @Composable
-fun HomeContent(userName: String, repositories: List<String>, onCheckUser: () -> Unit) {
+fun HomeContent(userName: String, repositories: List<RepositoryItem>, onCheckUser: () -> Unit) {
     var name by remember {
         mutableStateOf("")
     }
@@ -45,7 +46,11 @@ fun HomeContent(userName: String, repositories: List<String>, onCheckUser: () ->
         }
         LazyColumn(contentPadding = PaddingValues(16.dp, 8.dp)) {
             items(repositories) { repository ->
-                Text(text = repository)
+                Column(modifier = Modifier.fillMaxWidth()) {
+                    Text(text = repository.name, fontSize = 16.sp)
+                    Text(text = repository.fullName, fontSize = 10.sp)
+                    Text(text = repository.updatedAt, fontSize = 10.sp)
+                }
             }
         }
     }
@@ -55,6 +60,10 @@ fun HomeContent(userName: String, repositories: List<String>, onCheckUser: () ->
 @Composable
 fun HomePreview() {
     Native202031Theme {
-        HomeContent("user name", listOf("111", "222")) {}
+        val list = listOf(
+            RepositoryItem(name = "name1", fullName = "fullName1", updatedAt = "updatedAt1"),
+            RepositoryItem(name = "name2", fullName = "fullName2", updatedAt = "updatedAt2"),
+        )
+        HomeContent("user name", list) {}
     }
 }
