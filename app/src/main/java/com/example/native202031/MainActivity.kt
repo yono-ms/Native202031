@@ -3,16 +3,13 @@ package com.example.native202031
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.activity.viewModels
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Surface
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.compose.viewModel
-import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
@@ -27,25 +24,14 @@ class MainActivity : ComponentActivity() {
 
     private val logger: Logger by lazy { LoggerFactory.getLogger(javaClass.simpleName) }
 
-    private val mainViewModel: MainViewModel by viewModels()
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        logger.info("onCreate savedInstanceState=$savedInstanceState")
         setContent {
             Native202031Theme {
                 // A surface container using the 'background' color from the theme
                 Surface(color = MaterialTheme.colors.background) {
-                    MainScreen(mainViewModel) { navHostController ->
-                        lifecycleScope.launchWhenStarted {
-                            mainViewModel.destScreen.receiveAsFlow().collect { destScreen ->
-                                logger.info("destScreen=$destScreen")
-                                when (destScreen) {
-                                    DestScreen.BACK -> navHostController.popBackStack()
-                                    else -> navHostController.navigate(destScreen.route)
-                                }
-                            }
-                        }
-                    }
+                    MainScreen()
                 }
             }
         }
@@ -53,12 +39,8 @@ class MainActivity : ComponentActivity() {
 }
 
 @Composable
-fun MainScreen(
-    mainViewModel: MainViewModel,
-    receiveDestScreen: (navController: NavHostController) -> Unit
-) {
+fun MainScreen() {
     val navController = rememberNavController()
-    receiveDestScreen(navController)
     NavHost(navController = navController, startDestination = "home") {
 
         fun navigate(destScreen: DestScreen) {
@@ -69,10 +51,18 @@ fun MainScreen(
         }
 
         composable(DestScreen.HOME.route) {
-            HomeScreen(mainViewModel)
+            val viewModel: HomeViewModel = viewModel()
+            viewModel.viewModelScope.launch {
+                viewModel.destScreen.receiveAsFlow().collect { navigate(it) }
+            }
+            HomeScreen()
         }
         composable(DestScreen.SIGN_IN.route) {
-            SignInScreen(mainViewModel)
+            val viewModel: SignInViewModel = viewModel()
+            viewModel.viewModelScope.launch {
+                viewModel.destScreen.receiveAsFlow().collect { navigate(it) }
+            }
+            SignInScreen()
         }
         composable(DestScreen.CHECK_USER.route) {
             val viewModel: CheckUserViewModel = viewModel()

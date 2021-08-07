@@ -14,11 +14,22 @@ import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.native202031.ui.theme.Native202031Theme
 
 @Composable
-fun SignInScreen(viewModel: MainViewModel = MainViewModel()) {
-    val userName = viewModel.userName.collectAsState()
+fun SignInScreen(viewModel: SignInViewModel = viewModel()) {
+    val userName by viewModel.userName.collectAsState()
+
+    SignInContent(
+        userName = userName,
+        onUserNameChanged = { viewModel.userNameChanged(it) },
+        onSignIn = { viewModel.signIn() })
+}
+
+@Composable
+fun SignInContent(userName: String, onUserNameChanged: (String) -> Unit, onSignIn: () -> Unit) {
+
     var password by remember {
         mutableStateOf("")
     }
@@ -34,8 +45,8 @@ fun SignInScreen(viewModel: MainViewModel = MainViewModel()) {
         Text(text = "SignIn Screen!")
         Spacer(modifier = Modifier.height(16.dp))
         TextField(
-            value = userName.value,
-            onValueChange = { viewModel.userNameChanged(it) },
+            value = userName,
+            onValueChange = { onUserNameChanged(it) },
             label = { Text(text = "User Name") },
             placeholder = { Text(text = "your login name") },
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email),
@@ -60,7 +71,7 @@ fun SignInScreen(viewModel: MainViewModel = MainViewModel()) {
         )
         Spacer(modifier = Modifier.height(16.dp))
         Button(onClick = {
-            viewModel.popBackStack()
+            onSignIn()
         }) {
             Text(text = "sign in")
         }
@@ -71,6 +82,6 @@ fun SignInScreen(viewModel: MainViewModel = MainViewModel()) {
 @Composable
 fun SignInPreview() {
     Native202031Theme {
-        SignInScreen()
+        SignInContent(userName = "google", onUserNameChanged = {}, onSignIn = {})
     }
 }
