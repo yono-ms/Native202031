@@ -54,11 +54,20 @@ fun MainScreen() {
             }
         }
 
+        fun receiveDestScreen(
+            viewModel: BaseViewModel,
+            onReceive: (destScreen: DestScreen) -> Unit
+        ) {
+            viewModel.viewModelScope.launch {
+                viewModel.destScreen.receiveAsFlow().collect {
+                    onReceive(it)
+                }
+            }
+        }
+
         composable(DestScreen.HOME.route) { navBackStackEntry ->
             val viewModel: HomeViewModel = viewModel()
-            viewModel.viewModelScope.launch {
-                viewModel.destScreen.receiveAsFlow().collect { navigate(it) }
-            }
+            receiveDestScreen(viewModel) { navigate(it) }
             navBackStackEntry.savedStateHandle.get<String>(MainActivity.StateKey.USER_NAME.name)
                 ?.let {
                     viewModel.setUser(it)
@@ -67,21 +76,17 @@ fun MainScreen() {
         }
         composable(DestScreen.SIGN_IN.route) {
             val viewModel: SignInViewModel = viewModel()
-            viewModel.viewModelScope.launch {
-                viewModel.destScreen.receiveAsFlow().collect { navigate(it) }
-            }
+            receiveDestScreen(viewModel) { navigate(it) }
             SignInScreen()
         }
         composable(DestScreen.CHECK_USER.route) {
             val viewModel: CheckUserViewModel = viewModel()
-            viewModel.viewModelScope.launch {
-                viewModel.destScreen.receiveAsFlow().collect {
-                    navController.previousBackStackEntry?.savedStateHandle?.set(
-                        MainActivity.StateKey.USER_NAME.name,
-                        viewModel.userName.value
-                    )
-                    navigate(it)
-                }
+            receiveDestScreen(viewModel) {
+                navController.previousBackStackEntry?.savedStateHandle?.set(
+                    MainActivity.StateKey.USER_NAME.name,
+                    viewModel.userName.value
+                )
+                navigate(it)
             }
             CheckUserScreen()
         }
