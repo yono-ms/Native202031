@@ -1,32 +1,13 @@
 package com.example.native202031
 
-import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.native202031.network.ServerAPI
 import com.example.native202031.network.UserModel
-import kotlinx.coroutines.channels.Channel
-import kotlinx.coroutines.channels.ReceiveChannel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
-import org.slf4j.Logger
-import org.slf4j.LoggerFactory
 
-class CheckUserViewModel : ViewModel() {
-
-    private val logger: Logger by lazy { LoggerFactory.getLogger(javaClass.simpleName) }
-
-    private val _progress = MutableStateFlow(false)
-    val progress: StateFlow<Boolean> = _progress
-
-    private val _showDialog = MutableStateFlow(false)
-    val showDialog: StateFlow<Boolean> = _showDialog
-
-    private val _dialogMessage = MutableStateFlow("")
-    val dialogMessage: StateFlow<String> = _dialogMessage
-
-    private val _dialogTitle = MutableStateFlow<String?>(null)
-    val dialogTitle: StateFlow<String?> = _dialogTitle
+class CheckUserViewModel : BaseViewModel() {
 
     private val _userName = MutableStateFlow("")
     val userName: StateFlow<String> = _userName
@@ -53,7 +34,7 @@ class CheckUserViewModel : ViewModel() {
 
     fun check() {
         logger.info("check")
-        if (_progress.value) {
+        if (progress.value) {
             logger.info("...busy.")
             return
         }
@@ -66,32 +47,17 @@ class CheckUserViewModel : ViewModel() {
             }
 
             kotlin.runCatching {
-                _progress.value = true
+                showProgress()
                 ServerAPI.getDecode(ServerAPI.getUsersUrl(userName.value), UserModel.serializer())
             }.onSuccess { userModel ->
                 logger.debug("$userModel")
-                _destScreen.send(DestScreen.BACK)
+                sendDestScreen(DestScreen.BACK)
             }.onFailure {
                 logger.error("check", it)
                 showDialog(it.message, it.javaClass.simpleName)
             }.also {
-                _progress.value = false
+                hideProgress()
             }
         }
     }
-
-    private fun showDialog(message: String?, title: String? = null) {
-        _dialogMessage.value = message ?: "NO message."
-        _dialogTitle.value = title
-        _showDialog.value = true
-    }
-
-    fun dismissDialog() {
-        logger.info("dismissDialog")
-        viewModelScope.launch { _showDialog.value = false }
-    }
-
-    private val _destScreen = Channel<DestScreen>()
-    val destScreen: ReceiveChannel<DestScreen> = _destScreen
-
 }

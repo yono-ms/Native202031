@@ -60,6 +60,14 @@ fun MainScreen(
     val navController = rememberNavController()
     receiveDestScreen(navController)
     NavHost(navController = navController, startDestination = "home") {
+
+        fun navigate(destScreen: DestScreen) {
+            when (destScreen) {
+                DestScreen.BACK -> navController.popBackStack()
+                else -> navController.navigate(destScreen.route)
+            }
+        }
+
         composable(DestScreen.HOME.route) {
             HomeScreen(mainViewModel)
         }
@@ -69,12 +77,7 @@ fun MainScreen(
         composable(DestScreen.CHECK_USER.route) {
             val viewModel: CheckUserViewModel = viewModel()
             viewModel.viewModelScope.launch {
-                viewModel.destScreen.receiveAsFlow().collect {
-                    when (it) {
-                        DestScreen.BACK -> navController.popBackStack()
-                        else -> navController.navigate(it.route)
-                    }
-                }
+                viewModel.destScreen.receiveAsFlow().collect { navigate(it) }
             }
             CheckUserScreen()
         }
