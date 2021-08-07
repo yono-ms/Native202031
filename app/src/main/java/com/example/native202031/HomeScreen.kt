@@ -1,6 +1,8 @@
 package com.example.native202031
 
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.material.Button
 import androidx.compose.material.Text
 import androidx.compose.runtime.*
@@ -14,13 +16,14 @@ import com.example.native202031.ui.theme.Native202031Theme
 @Composable
 fun HomeScreen(viewModel: HomeViewModel = viewModel()) {
     val userName by viewModel.userName.collectAsState()
-    HomeContent(userName = userName) {
+    val repositories by viewModel.repositories.collectAsState()
+    HomeContent(userName = userName, repositories = repositories) {
         viewModel.checkUser()
     }
 }
 
 @Composable
-fun HomeContent(userName: String, onCheckUser: () -> Unit) {
+fun HomeContent(userName: String, repositories: List<String>, onCheckUser: () -> Unit) {
     var name by remember {
         mutableStateOf("")
     }
@@ -40,6 +43,11 @@ fun HomeContent(userName: String, onCheckUser: () -> Unit) {
         }) {
             Text(text = "Button to CheckUser")
         }
+        LazyColumn(contentPadding = PaddingValues(16.dp, 8.dp)) {
+            items(repositories) { repository ->
+                Text(text = repository)
+            }
+        }
     }
 }
 
@@ -47,6 +55,6 @@ fun HomeContent(userName: String, onCheckUser: () -> Unit) {
 @Composable
 fun HomePreview() {
     Native202031Theme {
-        HomeContent("user name") {}
+        HomeContent("user name", listOf("111", "222")) {}
     }
 }
