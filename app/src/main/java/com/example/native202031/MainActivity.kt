@@ -22,6 +22,10 @@ import org.slf4j.LoggerFactory
 
 class MainActivity : ComponentActivity() {
 
+    enum class StateKey {
+        USER_NAME
+    }
+
     private val logger: Logger by lazy { LoggerFactory.getLogger(javaClass.simpleName) }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -41,7 +45,7 @@ class MainActivity : ComponentActivity() {
 @Composable
 fun MainScreen() {
     val navController = rememberNavController()
-    NavHost(navController = navController, startDestination = "home") {
+    NavHost(navController = navController, startDestination = DestScreen.HOME.route) {
 
         fun navigate(destScreen: DestScreen) {
             when (destScreen) {
@@ -50,11 +54,15 @@ fun MainScreen() {
             }
         }
 
-        composable(DestScreen.HOME.route) {
+        composable(DestScreen.HOME.route) { navBackStackEntry ->
             val viewModel: HomeViewModel = viewModel()
             viewModel.viewModelScope.launch {
                 viewModel.destScreen.receiveAsFlow().collect { navigate(it) }
             }
+            navBackStackEntry.savedStateHandle.get<String>(MainActivity.StateKey.USER_NAME.name)
+                ?.let {
+                    viewModel.setUser(it)
+                }
             HomeScreen()
         }
         composable(DestScreen.SIGN_IN.route) {
@@ -67,7 +75,13 @@ fun MainScreen() {
         composable(DestScreen.CHECK_USER.route) {
             val viewModel: CheckUserViewModel = viewModel()
             viewModel.viewModelScope.launch {
-                viewModel.destScreen.receiveAsFlow().collect { navigate(it) }
+                viewModel.destScreen.receiveAsFlow().collect {
+                    navController.previousBackStackEntry?.savedStateHandle?.set(
+                        MainActivity.StateKey.USER_NAME.name,
+                        viewModel.userName.value
+                    )
+                    navigate(it)
+                }
             }
             CheckUserScreen()
         }
