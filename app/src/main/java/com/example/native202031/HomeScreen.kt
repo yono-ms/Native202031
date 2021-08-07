@@ -46,10 +46,8 @@ fun HomeScreen(viewModel: MainViewModel = MainViewModel()) {
         CircularProgressIndicator()
     }
     val showDialog = viewModel.showDialog.collectAsState()
-    if (showDialog.value) {
-        MessageDialog(text = "message") {
-            viewModel.showDialog.value = false
-        }
+    MessageDialog(showDialog = showDialog.value, text = "TEST") {
+
     }
 }
 
