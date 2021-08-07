@@ -47,6 +47,6 @@ fun HomeContent(userName: String, onCheckUser: () -> Unit) {
 @Composable
 fun HomePreview() {
     Native202031Theme {
-        HomeContent("user name", {})
+        HomeContent("user name") {}
     }
 }
