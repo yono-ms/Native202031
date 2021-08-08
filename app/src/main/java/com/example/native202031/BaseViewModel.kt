@@ -1,7 +1,10 @@
 package com.example.native202031
 
-import androidx.lifecycle.ViewModel
+import android.app.Application
+import androidx.core.content.edit
+import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
+import androidx.preference.PreferenceManager
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.channels.ReceiveChannel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -10,7 +13,8 @@ import kotlinx.coroutines.launch
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 
-open class BaseViewModel : ViewModel() {
+open class BaseViewModel(application: Application) : AndroidViewModel(application) {
+
     protected val logger: Logger by lazy { LoggerFactory.getLogger(javaClass.simpleName) }
 
     private val _destScreen = Channel<DestScreen>()
@@ -49,5 +53,20 @@ open class BaseViewModel : ViewModel() {
     fun dismissDialog() {
         logger.info("dismissDialog")
         viewModelScope.launch { _showDialog.value = false }
+    }
+
+    enum class PrefKey {
+        USER_NAME,
+    }
+
+    private val prefs =
+        PreferenceManager.getDefaultSharedPreferences(application.applicationContext)
+
+    protected fun getUserName(): String? {
+        return prefs.getString(PrefKey.USER_NAME.name, null)
+    }
+
+    protected fun setUserName(userName: String) {
+        prefs.edit { putString(PrefKey.USER_NAME.name, userName) }
     }
 }

@@ -1,11 +1,12 @@
 package com.example.native202031
 
+import android.app.Application
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 
-class SignInViewModel : BaseViewModel() {
+class SignInViewModel(application: Application) : BaseViewModel(application) {
 
     private val _userName = MutableStateFlow("")
     val userName: StateFlow<String> = _userName

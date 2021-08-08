@@ -1,5 +1,6 @@
 package com.example.native202031
 
+import android.app.Application
 import androidx.lifecycle.viewModelScope
 import com.example.native202031.network.ServerAPI
 import com.example.native202031.network.UserModel
@@ -7,7 +8,13 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 
-class CheckUserViewModel : BaseViewModel() {
+class CheckUserViewModel(application: Application) : BaseViewModel(application) {
+
+    init {
+        getUserName()?.let {
+            _userName.value = it
+        }
+    }
 
     private val _userName = MutableStateFlow("")
     val userName: StateFlow<String> = _userName
@@ -51,6 +58,7 @@ class CheckUserViewModel : BaseViewModel() {
                 ServerAPI.getDecode(ServerAPI.getUsersUrl(userName.value), UserModel.serializer())
             }.onSuccess { userModel ->
                 logger.debug("$userModel")
+                setUserName(userName.value)
                 sendDestScreen(DestScreen.BACK)
             }.onFailure {
                 logger.error("check", it)
