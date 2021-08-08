@@ -21,6 +21,22 @@ fun HomeScreen(viewModel: HomeViewModel = viewModel()) {
     HomeContent(userName = userName, repositories = repositories) {
         viewModel.checkUser()
     }
+
+    val progress by viewModel.progress.collectAsState()
+
+    FullScreenProgress(progress = progress)
+
+    val showDialog by viewModel.showDialog.collectAsState()
+    val dialogMessage by viewModel.dialogMessage.collectAsState()
+    val dialogTitle by viewModel.dialogTitle.collectAsState()
+
+    MessageDialog(
+        showDialog = showDialog,
+        text = dialogMessage,
+        title = dialogTitle
+    ) {
+        viewModel.dismissDialog()
+    }
 }
 
 @Composable
