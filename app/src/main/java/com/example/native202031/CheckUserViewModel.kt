@@ -10,12 +10,6 @@ import kotlinx.coroutines.launch
 
 class CheckUserViewModel(application: Application) : BaseViewModel(application) {
 
-    init {
-        getUserName()?.let {
-            _userName.value = it
-        }
-    }
-
     private val _userName = MutableStateFlow("")
     val userName: StateFlow<String> = _userName
 
@@ -65,6 +59,14 @@ class CheckUserViewModel(application: Application) : BaseViewModel(application) 
                 showDialog(it.message, it.javaClass.simpleName)
             }.also {
                 hideProgress()
+            }
+        }
+    }
+
+    init {
+        viewModelScope.launch {
+            getUserName()?.let {
+                _userName.value = it
             }
         }
     }

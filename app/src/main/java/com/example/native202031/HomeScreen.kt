@@ -1,5 +1,6 @@
 package com.example.native202031
 
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -18,7 +19,9 @@ import com.example.native202031.ui.theme.Native202031Theme
 fun HomeScreen(viewModel: HomeViewModel = viewModel()) {
     val userName by viewModel.userName.collectAsState()
     val repositories by viewModel.repositories.collectAsState()
-    HomeContent(userName = userName, repositories = repositories) {
+    HomeContent(userName = userName, repositories = repositories, onClickItem = {
+        viewModel.clickRepository(it)
+    }) {
         viewModel.checkUser()
     }
 
@@ -40,7 +43,12 @@ fun HomeScreen(viewModel: HomeViewModel = viewModel()) {
 }
 
 @Composable
-fun HomeContent(userName: String, repositories: List<RepositoryItem>, onCheckUser: () -> Unit) {
+fun HomeContent(
+    userName: String,
+    repositories: List<RepositoryItem>,
+    onClickItem: (repository: RepositoryItem) -> Unit,
+    onCheckUser: () -> Unit
+) {
     var name by remember {
         mutableStateOf("")
     }
@@ -60,9 +68,17 @@ fun HomeContent(userName: String, repositories: List<RepositoryItem>, onCheckUse
         }) {
             Text(text = "Button to CheckUser")
         }
-        LazyColumn(contentPadding = PaddingValues(16.dp, 8.dp)) {
-            items(repositories) { repository ->
-                Column(modifier = Modifier.fillMaxWidth()) {
+        Spacer(modifier = Modifier.height(16.dp))
+        LazyColumn(
+            contentPadding = PaddingValues(0.dp, 0.dp),
+            verticalArrangement = Arrangement.spacedBy(8.dp)
+        ) {
+            items(repositories, key = { item -> item.name }) { repository ->
+                Column(modifier = Modifier
+                    .fillMaxWidth()
+                    .clickable {
+                        onClickItem(repository)
+                    }) {
                     Text(text = repository.name, fontSize = 16.sp)
                     Text(text = repository.fullName, fontSize = 10.sp)
                     Text(text = repository.updatedAt, fontSize = 10.sp)
@@ -80,6 +96,6 @@ fun HomePreview() {
             RepositoryItem(name = "name1", fullName = "fullName1", updatedAt = "updatedAt1"),
             RepositoryItem(name = "name2", fullName = "fullName2", updatedAt = "updatedAt2"),
         )
-        HomeContent("user name", list) {}
+        HomeContent("user name", list, {}) {}
     }
 }

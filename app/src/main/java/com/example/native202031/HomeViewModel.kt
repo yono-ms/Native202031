@@ -19,6 +19,13 @@ class HomeViewModel(application: Application) : BaseViewModel(application) {
     private val _repositories = MutableStateFlow(listOf<RepositoryItem>())
     val repositories: StateFlow<List<RepositoryItem>> = _repositories
 
+    fun clickRepository(repository: RepositoryItem) {
+        logger.info("clickRepository $repository")
+        viewModelScope.launch {
+            sendDestScreen(DestScreen.CHECK_USER)
+        }
+    }
+
     fun checkUser() {
         logger.info("checkUser")
         viewModelScope.launch {
