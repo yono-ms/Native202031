@@ -3,6 +3,7 @@ package com.example.native202031
 import androidx.lifecycle.viewModelScope
 import com.example.native202031.network.ServerAPI
 import com.example.native202031.network.UserModel
+import com.example.native202031.preference.AppPrefs
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -11,7 +12,8 @@ import javax.inject.Inject
 
 @HiltViewModel
 class CheckUserViewModel @Inject constructor(
-    private val appPrefs: AppPrefs
+    private val appPrefs: AppPrefs,
+    private val serverAPI: ServerAPI
 ) : BaseViewModel() {
 
     private val _userName = MutableStateFlow("")
@@ -53,7 +55,7 @@ class CheckUserViewModel @Inject constructor(
 
             kotlin.runCatching {
                 showProgress()
-                ServerAPI.getDecode(ServerAPI.getUsersUrl(userName.value), UserModel.serializer())
+                serverAPI.getDecode(serverAPI.getUsersUrl(userName.value), UserModel.serializer())
             }.onSuccess { userModel ->
                 logger.debug("$userModel")
                 appPrefs.setUserName(userName.value)

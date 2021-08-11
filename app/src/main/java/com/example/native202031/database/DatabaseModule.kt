@@ -1,9 +1,7 @@
-package com.example.native202031
+package com.example.native202031.database
 
 import android.content.Context
 import androidx.room.Room
-import com.example.native202031.database.AppDB
-import com.example.native202031.database.CommitDao
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn

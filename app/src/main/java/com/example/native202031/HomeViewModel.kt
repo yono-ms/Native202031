@@ -4,6 +4,7 @@ import androidx.lifecycle.viewModelScope
 import com.example.native202031.network.RepoModel
 import com.example.native202031.network.ServerAPI
 import com.example.native202031.network.UserModel
+import com.example.native202031.preference.AppPrefs
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -14,7 +15,8 @@ import javax.inject.Inject
 
 @HiltViewModel
 class HomeViewModel @Inject constructor(
-    private val appPrefs: AppPrefs
+    private val appPrefs: AppPrefs,
+    private val serverAPI: ServerAPI
 ) : BaseViewModel() {
 
     private val _userName = MutableStateFlow(Date().toBestString())
@@ -56,11 +58,11 @@ class HomeViewModel @Inject constructor(
     }
 
     private suspend fun getRepositoryItems(userName: String): List<RepositoryItem> {
-        val userModel = ServerAPI.getDecode(
-            ServerAPI.getUsersUrl(userName),
+        val userModel = serverAPI.getDecode(
+            serverAPI.getUsersUrl(userName),
             UserModel.serializer()
         )
-        val repoModel = ServerAPI.getDecode(
+        val repoModel = serverAPI.getDecode(
             userModel.reposUrl,
             ListSerializer(RepoModel.serializer())
         )

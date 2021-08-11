@@ -1,4 +1,4 @@
-package com.example.native202031
+package com.example.native202031.preference
 
 import android.content.Context
 import dagger.Module
