@@ -1,17 +1,21 @@
 package com.example.native202031
 
-import android.app.Application
 import androidx.lifecycle.viewModelScope
 import com.example.native202031.network.RepoModel
 import com.example.native202031.network.ServerAPI
 import com.example.native202031.network.UserModel
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 import kotlinx.serialization.builtins.ListSerializer
 import java.util.*
+import javax.inject.Inject
 
-class HomeViewModel(application: Application) : BaseViewModel(application) {
+@HiltViewModel
+class HomeViewModel @Inject constructor(
+    private val appPrefs: AppPrefs
+) : BaseViewModel() {
 
     private val _userName = MutableStateFlow(Date().toBestString())
     val userName: StateFlow<String> = _userName
@@ -22,7 +26,7 @@ class HomeViewModel(application: Application) : BaseViewModel(application) {
     fun clickRepository(repository: RepositoryItem) {
         logger.info("clickRepository $repository")
         viewModelScope.launch {
-            sendDestScreen(DestScreen.CHECK_USER)
+            sendDestScreen(DestScreen.COMMIT)
         }
     }
 
@@ -64,10 +68,11 @@ class HomeViewModel(application: Application) : BaseViewModel(application) {
     }
 
     init {
+        logger.info("init")
         viewModelScope.launch {
             kotlin.runCatching {
                 showProgress()
-                getUserName()?.let {
+                appPrefs.getUserName()?.let {
                     _userName.value = it
                     _repositories.value = getRepositoryItems(it)
                 }

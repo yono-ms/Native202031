@@ -8,18 +8,20 @@ import androidx.compose.material.Surface
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.viewModelScope
-import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.example.native202031.ui.theme.Native202031Theme
+import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 
+@AndroidEntryPoint
 class MainActivity : ComponentActivity() {
 
     enum class StateKey {
@@ -66,7 +68,7 @@ fun MainScreen() {
         }
 
         composable(DestScreen.HOME.route) { navBackStackEntry ->
-            val viewModel: HomeViewModel = viewModel()
+            val viewModel: HomeViewModel = hiltViewModel()
             receiveDestScreen(viewModel) { navigate(it) }
             navBackStackEntry.savedStateHandle.get<String>(MainActivity.StateKey.USER_NAME.name)
                 ?.let {
@@ -75,12 +77,12 @@ fun MainScreen() {
             HomeScreen()
         }
         composable(DestScreen.SIGN_IN.route) {
-            val viewModel: SignInViewModel = viewModel()
+            val viewModel: SignInViewModel = hiltViewModel()
             receiveDestScreen(viewModel) { navigate(it) }
             SignInScreen()
         }
         composable(DestScreen.CHECK_USER.route) {
-            val viewModel: CheckUserViewModel = viewModel()
+            val viewModel: CheckUserViewModel = hiltViewModel()
             receiveDestScreen(viewModel) {
                 navController.previousBackStackEntry?.savedStateHandle?.set(
                     MainActivity.StateKey.USER_NAME.name,
@@ -89,6 +91,11 @@ fun MainScreen() {
                 navigate(it)
             }
             CheckUserScreen()
+        }
+        composable(DestScreen.COMMIT.route) {
+            val viewModel: CommitViewModel = hiltViewModel()
+            receiveDestScreen(viewModel) { navigate(it) }
+            CommitScreen()
         }
     }
 }
