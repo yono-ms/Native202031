@@ -13,11 +13,11 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.native202031.ui.theme.Native202031Theme
 
 @Composable
-fun CheckUserScreen(viewModel: CheckUserViewModel = viewModel()) {
+fun CheckUserScreen(viewModel: CheckUserViewModel = hiltViewModel()) {
 
     val userName by viewModel.userName.collectAsState()
     val userNameLabel by viewModel.userNameLabel.collectAsState()

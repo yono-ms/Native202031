@@ -7,19 +7,20 @@ import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Surface
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.lifecycle.viewModelScope
-import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.example.native202031.ui.theme.Native202031Theme
+import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.receiveAsFlow
-import kotlinx.coroutines.launch
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 
+@AndroidEntryPoint
 class MainActivity : ComponentActivity() {
 
     enum class StateKey {
@@ -45,50 +46,51 @@ class MainActivity : ComponentActivity() {
 @Composable
 fun MainScreen() {
     val navController = rememberNavController()
-    NavHost(navController = navController, startDestination = DestScreen.HOME.route) {
+    NavHost(navController = navController, startDestination = DestScreen.Route.HOME.rawValue) {
 
-        fun navigate(destScreen: DestScreen) {
-            when (destScreen) {
-                DestScreen.BACK -> navController.popBackStack()
-                else -> navController.navigate(destScreen.route)
-            }
-        }
-
-        fun receiveDestScreen(
-            viewModel: BaseViewModel,
-            onReceive: (destScreen: DestScreen) -> Unit
-        ) {
-            viewModel.viewModelScope.launch {
+        composable(DestScreen.Route.HOME.rawValue) { navBackStackEntry ->
+            val viewModel: HomeViewModel = hiltViewModel()
+            LaunchedEffect(Unit) {
                 viewModel.destScreen.receiveAsFlow().collect {
-                    onReceive(it)
+                    when (it.route) {
+                        DestScreen.Route.COMMIT -> navController.navigate(it.toRouteWithArgs())
+                        else -> navController.navigate(it.route.rawValue)
+                    }
                 }
             }
-        }
-
-        composable(DestScreen.HOME.route) { navBackStackEntry ->
-            val viewModel: HomeViewModel = viewModel()
-            receiveDestScreen(viewModel) { navigate(it) }
-            navBackStackEntry.savedStateHandle.get<String>(MainActivity.StateKey.USER_NAME.name)
-                ?.let {
-                    viewModel.setUser(it)
-                }
+            val resultName =
+                navBackStackEntry.savedStateHandle.get<String>(MainActivity.StateKey.USER_NAME.name)
+            resultName?.let {
+                viewModel.setUser(it)
+            }
             HomeScreen()
         }
-        composable(DestScreen.SIGN_IN.route) {
-            val viewModel: SignInViewModel = viewModel()
-            receiveDestScreen(viewModel) { navigate(it) }
+        composable(DestScreen.Route.SIGN_IN.rawValue) {
             SignInScreen()
         }
-        composable(DestScreen.CHECK_USER.route) {
-            val viewModel: CheckUserViewModel = viewModel()
-            receiveDestScreen(viewModel) {
-                navController.previousBackStackEntry?.savedStateHandle?.set(
-                    MainActivity.StateKey.USER_NAME.name,
-                    viewModel.userName.value
-                )
-                navigate(it)
+        composable(DestScreen.Route.CHECK_USER.rawValue) {
+            val viewModel: CheckUserViewModel = hiltViewModel()
+            LaunchedEffect(Unit) {
+                viewModel.destScreen.receiveAsFlow().collect {
+                    when (it.route) {
+                        DestScreen.Route.BACK -> {
+                            navController.previousBackStackEntry?.savedStateHandle?.set(
+                                MainActivity.StateKey.USER_NAME.name,
+                                viewModel.userName.value
+                            )
+                            navController.popBackStack()
+                        }
+                        else -> navController.navigate(it.route.rawValue)
+                    }
+                }
             }
             CheckUserScreen()
+        }
+        composable(DestScreen.Route.COMMIT.rawValue) { navBackStackEntry ->
+            navBackStackEntry.arguments?.getString("repo")?.let {
+                navBackStackEntry.savedStateHandle.set("repo", it)
+            }
+            CommitScreen()
         }
     }
 }

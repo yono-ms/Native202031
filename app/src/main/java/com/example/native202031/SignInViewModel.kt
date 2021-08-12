@@ -1,12 +1,11 @@
 package com.example.native202031
 
-import android.app.Application
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 
-class SignInViewModel(application: Application) : BaseViewModel(application) {
+class SignInViewModel : BaseViewModel() {
 
     private val _userName = MutableStateFlow("")
     val userName: StateFlow<String> = _userName
@@ -21,7 +20,7 @@ class SignInViewModel(application: Application) : BaseViewModel(application) {
     fun signIn() {
         logger.debug("signIn")
         viewModelScope.launch {
-            sendDestScreen(DestScreen.BACK)
+            sendDestScreen(DestScreen(route = DestScreen.Route.BACK))
         }
     }
 }

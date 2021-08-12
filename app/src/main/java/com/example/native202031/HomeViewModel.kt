@@ -1,17 +1,25 @@
 package com.example.native202031
 
-import android.app.Application
+import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.viewModelScope
 import com.example.native202031.network.RepoModel
 import com.example.native202031.network.ServerAPI
 import com.example.native202031.network.UserModel
+import com.example.native202031.preference.AppPrefs
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 import kotlinx.serialization.builtins.ListSerializer
 import java.util.*
+import javax.inject.Inject
 
-class HomeViewModel(application: Application) : BaseViewModel(application) {
+@HiltViewModel
+class HomeViewModel @Inject constructor(
+    private val savedStateHandle: SavedStateHandle,
+    private val appPrefs: AppPrefs,
+    private val serverAPI: ServerAPI
+) : BaseViewModel() {
 
     private val _userName = MutableStateFlow(Date().toBestString())
     val userName: StateFlow<String> = _userName
@@ -19,10 +27,26 @@ class HomeViewModel(application: Application) : BaseViewModel(application) {
     private val _repositories = MutableStateFlow(listOf<RepositoryItem>())
     val repositories: StateFlow<List<RepositoryItem>> = _repositories
 
+    lateinit var repo: String
+
+    fun clickRepository(repository: RepositoryItem) {
+        logger.info("clickRepository $repository")
+        viewModelScope.launch {
+//            savedStateHandle.set(DestScreen.COMMIT.argKey, repository.name)
+            repo = repository.name
+            sendDestScreen(
+                DestScreen(
+                    route = DestScreen.Route.COMMIT,
+                    args = repository.name
+                )
+            )
+        }
+    }
+
     fun checkUser() {
         logger.info("checkUser")
         viewModelScope.launch {
-            sendDestScreen(DestScreen.CHECK_USER)
+            sendDestScreen(DestScreen(route = DestScreen.Route.CHECK_USER))
         }
     }
 
@@ -45,11 +69,11 @@ class HomeViewModel(application: Application) : BaseViewModel(application) {
     }
 
     private suspend fun getRepositoryItems(userName: String): List<RepositoryItem> {
-        val userModel = ServerAPI.getDecode(
-            ServerAPI.getUsersUrl(userName),
+        val userModel = serverAPI.getDecode(
+            serverAPI.getUsersUrl(userName),
             UserModel.serializer()
         )
-        val repoModel = ServerAPI.getDecode(
+        val repoModel = serverAPI.getDecode(
             userModel.reposUrl,
             ListSerializer(RepoModel.serializer())
         )
@@ -57,10 +81,11 @@ class HomeViewModel(application: Application) : BaseViewModel(application) {
     }
 
     init {
+        logger.info("init")
         viewModelScope.launch {
             kotlin.runCatching {
                 showProgress()
-                getUserName()?.let {
+                appPrefs.getUserName()?.let {
                     _userName.value = it
                     _repositories.value = getRepositoryItems(it)
                 }

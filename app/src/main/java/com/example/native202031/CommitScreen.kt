@@ -1,29 +1,27 @@
 package com.example.native202031
 
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.material.Button
 import androidx.compose.material.Text
-import androidx.compose.runtime.*
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
+import com.example.native202031.database.CommitEntity
 import com.example.native202031.ui.theme.Native202031Theme
 
 @Composable
-fun HomeScreen(viewModel: HomeViewModel = hiltViewModel()) {
+fun CommitScreen(viewModel: CommitViewModel = hiltViewModel()) {
     val userName by viewModel.userName.collectAsState()
-    val repositories by viewModel.repositories.collectAsState()
-    HomeContent(userName = userName, repositories = repositories, onClickItem = {
-        viewModel.clickRepository(it)
-    }) {
-        viewModel.checkUser()
-    }
+    val repo by viewModel.repo.collectAsState()
+    val commits by viewModel.commits.collectAsState(listOf())
+    CommitContent(userName = userName, repo = repo, commits = commits)
 
     val progress by viewModel.progress.collectAsState()
 
@@ -43,15 +41,7 @@ fun HomeScreen(viewModel: HomeViewModel = hiltViewModel()) {
 }
 
 @Composable
-fun HomeContent(
-    userName: String,
-    repositories: List<RepositoryItem>,
-    onClickItem: (repository: RepositoryItem) -> Unit,
-    onCheckUser: () -> Unit
-) {
-    var name by remember {
-        mutableStateOf("")
-    }
+fun CommitContent(userName: String, repo: String, commits: List<CommitEntity>) {
     Column(
         modifier = Modifier
             .padding(16.dp)
@@ -60,28 +50,16 @@ fun HomeContent(
     ) {
         Text(text = userName)
         Spacer(modifier = Modifier.height(16.dp))
-        Text(text = name)
-        Spacer(modifier = Modifier.height(16.dp))
-        Button(onClick = {
-            name = "pushed!"
-            onCheckUser()
-        }) {
-            Text(text = "Button to CheckUser")
-        }
+        Text(text = repo)
         Spacer(modifier = Modifier.height(16.dp))
         LazyColumn(
             contentPadding = PaddingValues(0.dp, 0.dp),
             verticalArrangement = Arrangement.spacedBy(8.dp)
         ) {
-            items(repositories, key = { item -> item.name }) { repository ->
-                Column(modifier = Modifier
-                    .fillMaxWidth()
-                    .clickable {
-                        onClickItem(repository)
-                    }) {
-                    Text(text = repository.name, fontSize = 16.sp)
-                    Text(text = repository.fullName, fontSize = 10.sp)
-                    Text(text = repository.updatedAt, fontSize = 10.sp)
+            items(commits) { commit ->
+                Column(modifier = Modifier.fillMaxWidth()) {
+                    Text(text = commit.message, fontSize = 16.sp)
+                    Text(text = commit.getCommitterDateString(), fontSize = 10.sp)
                 }
             }
         }
@@ -90,12 +68,30 @@ fun HomeContent(
 
 @Preview(showBackground = true)
 @Composable
-fun HomePreview() {
+fun CommitPreview() {
     Native202031Theme {
         val list = listOf(
-            RepositoryItem(name = "name1", fullName = "fullName1", updatedAt = "updatedAt1"),
-            RepositoryItem(name = "name2", fullName = "fullName2", updatedAt = "updatedAt2"),
+            CommitEntity(
+                message = "message1",
+                id = 1,
+                year = 1,
+                month = 1,
+                dayOfMonth = 1,
+                committerDate = 1,
+                login = "",
+                repo = ""
+            ),
+            CommitEntity(
+                message = "message1",
+                id = 1,
+                year = 1,
+                month = 1,
+                dayOfMonth = 1,
+                committerDate = 1,
+                login = "",
+                repo = ""
+            ),
         )
-        HomeContent("user name", list, {}) {}
+        CommitContent("user name", "repo", list)
     }
 }

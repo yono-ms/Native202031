@@ -14,11 +14,11 @@ import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.native202031.ui.theme.Native202031Theme
 
 @Composable
-fun SignInScreen(viewModel: SignInViewModel = viewModel()) {
+fun SignInScreen(viewModel: SignInViewModel = hiltViewModel()) {
     val userName by viewModel.userName.collectAsState()
 
     SignInContent(
