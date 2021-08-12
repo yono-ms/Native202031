@@ -15,7 +15,7 @@ data class DestScreen(
     val argKey = "repo"
 
     fun toRouteWithArgs(): String {
-        return this.route.rawValue.replace("/{$argKey}", args)
+        return this.route.rawValue.replace("{$argKey}", args)
     }
 
 }

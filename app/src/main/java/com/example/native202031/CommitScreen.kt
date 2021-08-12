@@ -11,10 +11,11 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.native202031.ui.theme.Native202031Theme
 
 @Composable
-fun CommitScreen(viewModel: CommitViewModel = androidx.lifecycle.viewmodel.compose.viewModel()) {
+fun CommitScreen(viewModel: CommitViewModel = hiltViewModel()) {
     val userName by viewModel.userName.collectAsState()
     val repo by viewModel.repo.collectAsState()
     CommitContent(userName = userName, repo = repo)
