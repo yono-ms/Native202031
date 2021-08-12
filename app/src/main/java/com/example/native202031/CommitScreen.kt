@@ -16,7 +16,8 @@ import com.example.native202031.ui.theme.Native202031Theme
 @Composable
 fun CommitScreen(viewModel: CommitViewModel = androidx.lifecycle.viewmodel.compose.viewModel()) {
     val userName by viewModel.userName.collectAsState()
-    CommitContent(userName = userName)
+    val repo by viewModel.repo.collectAsState()
+    CommitContent(userName = userName, repo = repo)
 
     val progress by viewModel.progress.collectAsState()
 
@@ -36,7 +37,7 @@ fun CommitScreen(viewModel: CommitViewModel = androidx.lifecycle.viewmodel.compo
 }
 
 @Composable
-fun CommitContent(userName: String) {
+fun CommitContent(userName: String, repo: String) {
     Column(
         modifier = Modifier
             .padding(16.dp)
@@ -44,6 +45,7 @@ fun CommitContent(userName: String) {
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Text(text = userName)
+        Text(text = repo)
     }
 }
 
@@ -51,6 +53,6 @@ fun CommitContent(userName: String) {
 @Composable
 fun CommitPreview() {
     Native202031Theme {
-        CommitContent("user name")
+        CommitContent("user name", "repo")
     }
 }

@@ -1,5 +1,6 @@
 package com.example.native202031
 
+import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.viewModelScope
 import com.example.native202031.network.RepoModel
 import com.example.native202031.network.ServerAPI
@@ -15,6 +16,7 @@ import javax.inject.Inject
 
 @HiltViewModel
 class HomeViewModel @Inject constructor(
+    private val savedStateHandle: SavedStateHandle,
     private val appPrefs: AppPrefs,
     private val serverAPI: ServerAPI
 ) : BaseViewModel() {
@@ -25,17 +27,26 @@ class HomeViewModel @Inject constructor(
     private val _repositories = MutableStateFlow(listOf<RepositoryItem>())
     val repositories: StateFlow<List<RepositoryItem>> = _repositories
 
+    lateinit var repo: String
+
     fun clickRepository(repository: RepositoryItem) {
         logger.info("clickRepository $repository")
         viewModelScope.launch {
-            sendDestScreen(DestScreen.COMMIT)
+//            savedStateHandle.set(DestScreen.COMMIT.argKey, repository.name)
+            repo = repository.name
+            sendDestScreen(
+                DestScreen(
+                    route = DestScreen.Route.COMMIT,
+                    args = repository.name
+                )
+            )
         }
     }
 
     fun checkUser() {
         logger.info("checkUser")
         viewModelScope.launch {
-            sendDestScreen(DestScreen.CHECK_USER)
+            sendDestScreen(DestScreen(route = DestScreen.Route.CHECK_USER))
         }
     }
 

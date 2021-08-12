@@ -20,7 +20,7 @@ class SignInViewModel : BaseViewModel() {
     fun signIn() {
         logger.debug("signIn")
         viewModelScope.launch {
-            sendDestScreen(DestScreen.BACK)
+            sendDestScreen(DestScreen(route = DestScreen.Route.BACK))
         }
     }
 }

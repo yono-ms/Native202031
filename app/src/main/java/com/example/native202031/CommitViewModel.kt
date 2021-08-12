@@ -1,5 +1,6 @@
 package com.example.native202031
 
+import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.viewModelScope
 import com.example.native202031.database.AppCache
 import com.example.native202031.preference.AppPrefs
@@ -12,12 +13,16 @@ import javax.inject.Inject
 
 @HiltViewModel
 class CommitViewModel @Inject constructor(
+    private val savedStateHandle: SavedStateHandle,
     private val appPrefs: AppPrefs,
     private val appCache: AppCache
 ) : BaseViewModel() {
 
     private val _userName = MutableStateFlow(Date().toBestString())
     val userName: StateFlow<String> = _userName
+
+    private val _repo = MutableStateFlow("")
+    val repo: StateFlow<String> = _repo
 
     init {
         logger.info("init")
@@ -26,6 +31,9 @@ class CommitViewModel @Inject constructor(
                 showProgress()
                 appPrefs.getUserName()?.let {
                     _userName.value = it
+                }
+                savedStateHandle.get<String>("repo")?.let {
+                    _repo.value = it
                 }
             }.onFailure {
                 logger.error("init", it)

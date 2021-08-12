@@ -59,7 +59,7 @@ class CheckUserViewModel @Inject constructor(
             }.onSuccess { userModel ->
                 logger.debug("$userModel")
                 appPrefs.setUserName(userName.value)
-                sendDestScreen(DestScreen.BACK)
+                sendDestScreen(DestScreen(route = DestScreen.Route.BACK))
             }.onFailure {
                 logger.error("check", it)
                 showDialog(it.message, it.javaClass.simpleName)
