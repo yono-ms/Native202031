@@ -36,7 +36,8 @@ class CommitViewModel @Inject constructor(
                 appPrefs.getUserName()?.let {
                     _userName.value = it
                 }
-                savedStateHandle.get<String>("repo")?.let {
+                val key = DestScreen.Route.COMMIT.argKey
+                savedStateHandle.get<String>(key)?.let {
                     _repo.value = it
                 }
                 appCache.getCommits(_userName.value, _repo.value)
