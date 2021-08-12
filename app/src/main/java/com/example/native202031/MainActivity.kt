@@ -87,8 +87,9 @@ fun MainScreen() {
             CheckUserScreen()
         }
         composable(DestScreen.Route.COMMIT.rawValue) { navBackStackEntry ->
-            navBackStackEntry.arguments?.getString("repo")?.let {
-                navBackStackEntry.savedStateHandle.set("repo", it)
+            val key = DestScreen.Route.COMMIT.argKey
+            navBackStackEntry.arguments?.getString(key)?.let {
+                navBackStackEntry.savedStateHandle.set(key, it)
             }
             CommitScreen()
         }

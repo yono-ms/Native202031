@@ -1,6 +1,5 @@
 package com.example.native202031
 
-import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.viewModelScope
 import com.example.native202031.network.RepoModel
 import com.example.native202031.network.ServerAPI
@@ -16,7 +15,6 @@ import javax.inject.Inject
 
 @HiltViewModel
 class HomeViewModel @Inject constructor(
-    private val savedStateHandle: SavedStateHandle,
     private val appPrefs: AppPrefs,
     private val serverAPI: ServerAPI
 ) : BaseViewModel() {
@@ -32,7 +30,6 @@ class HomeViewModel @Inject constructor(
     fun clickRepository(repository: RepositoryItem) {
         logger.info("clickRepository $repository")
         viewModelScope.launch {
-//            savedStateHandle.set(DestScreen.COMMIT.argKey, repository.name)
             repo = repository.name
             sendDestScreen(
                 DestScreen(
