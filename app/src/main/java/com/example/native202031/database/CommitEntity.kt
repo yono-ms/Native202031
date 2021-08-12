@@ -16,9 +16,11 @@ data class CommitEntity(
     @ColumnInfo(name = "day_of_month") val dayOfMonth: Int,
     @ColumnInfo(name = "committer_date") val committerDate: Long,
     @ColumnInfo(name = "message") val message: String,
+    @ColumnInfo(name = "login") val login: String,
+    @ColumnInfo(name = "repo") val repo: String,
 ) {
     companion object {
-        fun fromCommit(commitModel: CommitModel): CommitEntity {
+        fun fromCommit(commitModel: CommitModel, login: String, repo: String): CommitEntity {
             val date = commitModel.commit.committer.date.fromIsoToDate()
             val cal = Calendar.getInstance(Locale.getDefault()).apply { time = date }
             return CommitEntity(
@@ -28,6 +30,8 @@ data class CommitEntity(
                 cal[Calendar.DAY_OF_MONTH],
                 date.time,
                 commitModel.commit.message,
+                login,
+                repo,
             )
         }
     }

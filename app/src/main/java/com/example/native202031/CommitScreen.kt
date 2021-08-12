@@ -13,13 +13,14 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
+import com.example.native202031.database.CommitEntity
 import com.example.native202031.ui.theme.Native202031Theme
 
 @Composable
 fun CommitScreen(viewModel: CommitViewModel = hiltViewModel()) {
     val userName by viewModel.userName.collectAsState()
     val repo by viewModel.repo.collectAsState()
-    val commits by viewModel.commits.collectAsState()
+    val commits by viewModel.commits.collectAsState(listOf())
     CommitContent(userName = userName, repo = repo, commits = commits)
 
     val progress by viewModel.progress.collectAsState()
@@ -40,7 +41,7 @@ fun CommitScreen(viewModel: CommitViewModel = hiltViewModel()) {
 }
 
 @Composable
-fun CommitContent(userName: String, repo: String, commits: List<CommitItem>) {
+fun CommitContent(userName: String, repo: String, commits: List<CommitEntity>) {
     Column(
         modifier = Modifier
             .padding(16.dp)
@@ -58,8 +59,7 @@ fun CommitContent(userName: String, repo: String, commits: List<CommitItem>) {
             items(commits) { commit ->
                 Column(modifier = Modifier.fillMaxWidth()) {
                     Text(text = commit.message, fontSize = 16.sp)
-                    Text(text = commit.name, fontSize = 10.sp)
-                    Text(text = commit.date, fontSize = 10.sp)
+                    Text(text = commit.getCommitterDateString(), fontSize = 10.sp)
                 }
             }
         }
@@ -71,8 +71,26 @@ fun CommitContent(userName: String, repo: String, commits: List<CommitItem>) {
 fun CommitPreview() {
     Native202031Theme {
         val list = listOf(
-            CommitItem(message = "message1", name = "name1", date = "date1"),
-            CommitItem(message = "message2", name = "name2", date = "date2")
+            CommitEntity(
+                message = "message1",
+                id = 1,
+                year = 1,
+                month = 1,
+                dayOfMonth = 1,
+                committerDate = 1,
+                login = "",
+                repo = ""
+            ),
+            CommitEntity(
+                message = "message1",
+                id = 1,
+                year = 1,
+                month = 1,
+                dayOfMonth = 1,
+                committerDate = 1,
+                login = "",
+                repo = ""
+            ),
         )
         CommitContent("user name", "repo", list)
     }
